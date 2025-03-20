@@ -1,0 +1,203 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My API",
+        "description": "Описание API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://example.com/api"
+        },
+        {
+            "url": "https://uber.local"
+        }
+    ],
+    "paths": {
+        "/api/example": {
+            "get": {
+                "summary": "Пример запроса",
+                "description": "Получение примера",
+                "operationId": "58460a22e78af2ea52798f37fe467583",
+                "responses": {
+                    "200": {
+                        "description": "Успешный ответ"
+                    }
+                }
+            }
+        },
+        "/api": {
+            "post": {
+                "tags": [
+                    "Sensor Data"
+                ],
+                "summary": "Прием данных от датчиков",
+                "description": "API получает данные от датчика и сохраняет их в базе",
+                "operationId": "storeSensorData",
+                "parameters": [
+                    {
+                        "name": "sensor",
+                        "in": "query",
+                        "description": "Идентификатор датчика",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "text/plain": {
+                            "schema": {
+                                "type": "string",
+                                "example": "T=20"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Данные успешно сохранены",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Данные сохранены"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные данные",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Некорректные данные"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/history": {
+            "get": {
+                "tags": [
+                    "Sensor Data"
+                ],
+                "summary": "Получение истории параметра",
+                "description": "Возвращает историю изменения параметра за определённый интервал",
+                "operationId": "getSensorHistory",
+                "parameters": [
+                    {
+                        "name": "sensor_type",
+                        "in": "query",
+                        "description": "Тип параметра (T - температура, P - давление, v - скорость вращения)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "T",
+                                "P",
+                                "v"
+                            ],
+                            "example": "T"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Начало интервала (формат: YYYY-MM-DD HH:MM:SS)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2025-03-20 12:00:00"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "Конец интервала (формат: YYYY-MM-DD HH:MM:SS)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2025-03-20 14:00:00"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "История параметра",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "sensor_type": {
+                                            "type": "string",
+                                            "example": "T"
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "timestamp": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-03-20 12:30:00"
+                                                    },
+                                                    "value": {
+                                                        "type": "number",
+                                                        "example": 20.5
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные параметры запроса",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Некорректные параметры запроса"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Sensor Data",
+            "description": "Sensor Data"
+        }
+    ]
+}
