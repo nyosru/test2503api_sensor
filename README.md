@@ -6,13 +6,13 @@
 3) устанавливаете композер пакеты 
 php composer.phar i
 4) запускаете свагер и кликаете апи
-/api/documentation
+   https://test-sensor.php-cat.com/api/documentation
 
 настройка бд не нужна так как используется sqlite (для теста пойдёт)
 
 добавил свагер чтобы покликать как работает апи
 он доступен по адресу
-/api/documentation
+https://test-sensor.php-cat.com/api/documentation
 
 созданы 2 маршрута для апи
 
