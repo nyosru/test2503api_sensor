@@ -192,8 +192,7 @@ class SensorController extends Controller
      *         response=200,
      *         description="История параметра",
      *         @OA\JsonContent(
-     *             @OA\Property(property="sensor_type", type="string", example="T"),
-     *             @OA\Property(property="history", type="array",
+     *             @OA\Property(property="data", type="array",
      *                 @OA\Items(
      *                     @OA\Property(property="timestamp", type="string", format="date-time", example="2025-03-20 12:30:00"),
      *                     @OA\Property(property="value", type="number", example=20.5)

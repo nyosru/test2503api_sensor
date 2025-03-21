@@ -235,11 +235,7 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "sensor_type": {
-                                            "type": "string",
-                                            "example": "T"
-                                        },
-                                        "history": {
+                                        "data": {
                                             "type": "array",
                                             "items": {
                                                 "properties": {
