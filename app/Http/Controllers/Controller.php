@@ -12,7 +12,7 @@ namespace App\Http\Controllers;
  *      url="https://test-sensor.php-cat.com",
  *  )
  * @OA\Server(
- *      url="https://uber.local",
+ *      url="https://sensor.local",
  *  )
  */
 abstract class Controller

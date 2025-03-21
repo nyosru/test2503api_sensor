@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
             'api*', // <-- exclude this route
-//            'api/history' // <-- exclude this route
+//            'api/history', // <-- exclude this route
+//            'api/history/r' // <-- exclude this route
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

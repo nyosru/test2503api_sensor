@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SensorDataResource;
 use App\Models\SensorData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -9,18 +10,30 @@ use Illuminate\Http\Request;
 class SensorController extends Controller
 {
 
-
-    public function store1(Request $request)
+    /**
+     * тащим данные истории сенсоров
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getData(Request $request)
     {
-        $sensorData = new SensorData();
-        $sensorData->sensor_type = $request->input('sensor_type');
-        $sensorData->value = $request->input('value');
-        $sensorData->created_at = now(); // Установка created_at вручную
-        $sensorData->save();
+        $parameter = $request->query('sensor_type');
+        $from = $request->query('from');
+        $to = $request->query('to');
 
-        return response()->json(['message' => 'Данные сохранены']);
+        if (!$parameter || !$from || !$to || !in_array($parameter, ['T', 'P', 'v'])) {
+            return response()->json(['message' => 'Некорректные параметры запроса'], 400);
+        }
+
+        $history = SensorData::
+//        where('sensor_id', $sensorId)
+//            ->
+        where('sensor_type', $parameter)
+            ->whereBetween('created_at', [new Carbon($from), new Carbon($to)])
+            ->orderBy('created_at', 'asc')
+            ->get(['created_at as timestamp', 'value']);
+        return $history;
     }
-
 
 
     /**
@@ -84,6 +97,7 @@ class SensorController extends Controller
         return response()->json(['message' => 'Данные сохранены']);
     }
 
+
     /**
      * @OA\Get(
      *     path="/api/history",
@@ -136,27 +150,73 @@ class SensorController extends Controller
      */
     public function history(Request $request)
     {
-//        $sensorId = $request->query('sensor');
+
+        $history = $this->getData($request);
         $parameter = $request->query('sensor_type');
-        $from = $request->query('from');
-        $to = $request->query('to');
-
-        if ( !$parameter || !$from || !$to || !in_array($parameter, ['T', 'P', 'v'])) {
-            return response()->json(['message' => 'Некорректные параметры запроса'], 400);
-        }
-
-        $history = SensorData::
-//        where('sensor_id', $sensorId)
-//            ->
-            where('sensor_type', $parameter)
-            ->whereBetween('created_at', [new Carbon($from), new Carbon($to)])
-            ->orderBy('created_at', 'asc')
-            ->get(['created_at as timestamp', 'value']);
 
         return response()->json([
-//            'sensor' => $sensorId,
             'sensor_type' => $parameter,
             'history' => $history,
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/history/r",
+     *     summary="Получение истории параметра (используем API resource для подготовки ответа) ",
+     *     description="Возвращает историю изменения параметра за определённый интервал ",
+     *     operationId="getSensorHistoryR",
+     *     tags={"Sensor Data"},
+     *     @OA\Parameter(
+     *         name="sensor_type",
+     *         in="query",
+     *         required=true,
+     *         description="Тип параметра (T - температура, P - давление, v - скорость вращения)",
+     *         @OA\Schema(type="string", enum={"T", "P", "v"}, example="T")
+     *     ),
+     *     @OA\Parameter(
+     *         name="from",
+     *         in="query",
+     *         required=true,
+     *         description="Начало интервала (формат: YYYY-MM-DD HH:MM:SS)",
+     *         @OA\Schema(type="string", format="date-time", example="2025-03-20 12:00:00")
+     *     ),
+     *     @OA\Parameter(
+     *         name="to",
+     *         in="query",
+     *         required=true,
+     *         description="Конец интервала (формат: YYYY-MM-DD HH:MM:SS)",
+     *         @OA\Schema(type="string", format="date-time", example="2025-03-20 14:00:00")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="История параметра",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="sensor_type", type="string", example="T"),
+     *             @OA\Property(property="history", type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="timestamp", type="string", format="date-time", example="2025-03-20 12:30:00"),
+     *                     @OA\Property(property="value", type="number", example=20.5)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Некорректные параметры запроса",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Некорректные параметры запроса")
+     *         )
+     *     )
+     * )
+     */
+    public function historyR(Request $request)
+    {
+
+        $history = $this->getData($request);
+        $parameter = $request->query('sensor_type');
+
+        return new SensorDataResource($history);
+
     }
 }
